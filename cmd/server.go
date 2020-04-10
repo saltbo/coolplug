@@ -5,6 +5,7 @@ import (
 	"os"
 	"time"
 
+	_ "github.com/jinzhu/gorm/dialects/sqlite"
 	"github.com/urfave/cli"
 
 	"github.com/saltbo/coolplug/core"
@@ -48,7 +49,7 @@ func main() {
 }
 
 func serverAction(c *cli.Context) {
-	engine, err := core.New(c.String(FLAG_DRIVER), c.String(FLAG_DSN), c.String(FLAG_PLUGIN_DIR))
+	engine, err := core.New(c.String(FLAG_DRIVER), c.String(FLAG_DSN))
 	if err != nil {
 		log.Fatalln(err)
 	}

@@ -1,6 +1,7 @@
 package plugin
 
 import (
+	"context"
 	"plugin"
 
 	"github.com/gin-gonic/gin"
@@ -9,13 +10,17 @@ import (
 )
 
 type Context struct {
+	context.Context
+
 	Router   *gin.RouterGroup
 	Database *gorm.DB
 	Cron     *cron.Cron
 }
 
-func NewContext(router *gin.RouterGroup, database *gorm.DB, cron *cron.Cron) *Context {
+func NewContext(ctx context.Context, router *gin.RouterGroup, database *gorm.DB, cron *cron.Cron) *Context {
 	return &Context{
+		Context: ctx,
+
 		Router:   router,
 		Database: database,
 		Cron:     cron,
@@ -23,8 +28,19 @@ func NewContext(router *gin.RouterGroup, database *gorm.DB, cron *cron.Cron) *Co
 }
 
 type Plugin interface {
-	Install(c *Context) error
+	Name() string
+
+	// It will be called when the plugin be installed
+	Install() error
+
+	// It will be called when the plugin be uninstalled
 	Uninstall() error
+
+	// It will be called when the system starts
+	Run(c *Context) error
+
+	// It will be called when the system shutdown
+	Stop() error
 }
 
 func Load(filename string) (Plugin, error) {
