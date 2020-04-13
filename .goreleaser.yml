@@ -7,23 +7,34 @@ before:
     # you may remove this if you don't need go generate
     - go generate ./...
 builds:
-- main: ./cmd/server.go
-  env:
-  - CGO_ENABLED=0
-  goos:
-    - linux
-    - darwin
-    - windows
-  goarch:
-    - 386
-    - amd64
-  ignore:
-    - goos: darwin
-      goarch: 386
+  - main: ./cmd/server.go
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - darwin
+      - windows
+    goarch:
+      - 386
+      - amd64
+    ignore:
+      - goos: darwin
+        goarch: 386
 archives:
-- name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
-  replacements:
-    darwin: macOS
+  - name_template: "{{ .ProjectName }}_{{ .Os }}_{{ .Arch }}"
+    replacements:
+      darwin: macOS
+    wrap_in_directory: true
+    format: tar.gz
+    format_overrides:  # archive as zip on Windows
+      - goos: windows
+        format: zip
+    files:
+      - LICENCE*
+      - LICENSE*
+      - README*
+      - CHANGELOG*
+      - docs/*
 checksum:
   name_template: 'checksums.txt'
 snapshot:
@@ -32,5 +43,5 @@ changelog:
   sort: desc
   filters:
     exclude:
-    - '^docs:'
-    - '^test:'
+      - '^docs:'
+      - '^test:'
