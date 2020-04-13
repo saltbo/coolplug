@@ -1,4 +1,6 @@
-on: 
+on:
+  push:
+    branches: [ master ]
   release:
     types: [created]
 
@@ -9,8 +11,8 @@ jobs:
     strategy:
       matrix:
         # build and publish in parallel: linux/386, linux/amd64, windows/386, windows/amd64, darwin/386, darwin/amd64 
-        goos: [linux, windows, darwin]
-        goarch: ["386", amd64]
+        goos: [linux, darwin]
+        goarch: [amd64]
     steps:
     - uses: actions/checkout@v2
     - uses: wangyoucao577/go-release-action@master
@@ -19,5 +21,5 @@ jobs:
         goos: ${{ matrix.goos }}
         goarch: ${{ matrix.goarch }}
         goversion: "https://dl.google.com/go/go1.13.10.linux-amd64.tar.gz"
-        project_path: "./cmd/server"
+        project_path: "./cmd/server.go"
         binary_name: "server"
