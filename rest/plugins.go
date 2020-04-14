@@ -3,12 +3,15 @@ package rest
 import (
 	"fmt"
 	"net/http"
-	"path/filepath"
+	"strconv"
+	"strings"
 
 	"github.com/gin-gonic/gin"
+	"github.com/jinzhu/gorm"
 
 	"github.com/saltbo/coolplug/core"
 	"github.com/saltbo/coolplug/model"
+	"github.com/saltbo/coolplug/rest/binding"
 )
 
 type PluginResource struct {
@@ -24,7 +27,7 @@ func NewPluginResource(engine *core.Engine) *PluginResource {
 func (r *PluginResource) Register(router *gin.RouterGroup) {
 	router.GET("/plugins", r.list)
 	router.POST("/plugins", r.install)
-	router.DELETE("/plugins", r.uninstall)
+	router.DELETE("/plugins/:id", r.uninstall)
 }
 
 func (r *PluginResource) list(c *gin.Context) {
@@ -34,25 +37,22 @@ func (r *PluginResource) list(c *gin.Context) {
 }
 
 func (r *PluginResource) install(c *gin.Context) {
-	name := c.PostForm("name")
-	intro := c.PostForm("intro")
-
-	// Source
-	file, err := c.FormFile("file")
-	if err != nil {
-		c.String(http.StatusBadRequest, fmt.Sprintf("get form err: %s", err.Error()))
+	p := new(binding.Plugin)
+	if err := c.ShouldBind(p); err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
 		return
 	}
 
-	filename := filepath.Base(file.Filename)
-	if err := c.SaveUploadedFile(file, filename); err != nil {
-		c.String(http.StatusBadRequest, fmt.Sprintf("upload file err: %s", err.Error()))
+	filename := fmt.Sprintf("./build/plugins/%s.so", strings.ToLower(p.Name))
+	err := c.SaveUploadedFile(p.File, filename)
+	if err != nil {
+		c.String(http.StatusInternalServerError, "unknown error")
 		return
 	}
 
 	mp := &model.Plugin{
-		Name:     name,
-		Intro:    intro,
+		Name:     p.Name,
+		Intro:    p.Intro,
 		Thumb:    "",
 		Status:   0,
 		Filename: filename,
@@ -62,13 +62,17 @@ func (r *PluginResource) install(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusOK, fmt.Sprintf("File %s uploaded successfully with fields name=%s.", file.Filename, name))
+	c.Status(http.StatusOK)
 }
 
 func (r *PluginResource) uninstall(c *gin.Context) {
-	name := c.PostForm("name")
+	id, err := strconv.Atoi(c.Param("id"))
+	if err != nil {
+		c.AbortWithError(http.StatusBadRequest, err)
+		return
+	}
 
-	mp := &model.Plugin{Name: name}
+	mp := &model.Plugin{Model: gorm.Model{ID: uint(id)}}
 	if err := r.engine.Database.First(mp).Error; err != nil {
 		//fmt.Errorf("plugin [%s] not exist", filename)
 		return

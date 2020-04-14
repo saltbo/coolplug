@@ -1,7 +1,8 @@
 .PHONY: all dep lint vet test test-coverage build clean
 
 # custom define
-MAIN := "cmd/server.go"
+SERVER := "cmd/server/main.go"
+CLIENT := "cmd/client/main.go"
 
 all: build
 
@@ -20,7 +21,8 @@ coverage-html: ## show coverage by the html
 	go tool cover -html=.coverprofile
 
 build: dep ## Build the binary file
-	@go build -i -o build/main $(MAIN)
+	@go build -i -o build/bin/server $(SERVER)
+	@go build -i -o build/bin/client $(CLIENT)
 
 clean: ## Remove previous build
 	@rm -f ./build
