@@ -37,7 +37,7 @@ func New(driver, dsn string) (*Engine, error) {
 		Database:   db,
 		Cron:       cron.New(),
 		installer:  NewPluginInstaller(),
-		instanceCh: make(chan plugin.Plugin, 0),
+		instanceCh: make(chan plugin.Plugin),
 	}
 
 	return engine, nil
@@ -107,11 +107,8 @@ func (e *Engine) Boot() error {
 
 	// run the installed plugins
 	go func() {
-		for {
-			select {
-			case instance := <-e.instanceCh:
-				e.runPlugin(instance)
-			}
+		for instance := range e.instanceCh {
+			e.runPlugin(instance)
 		}
 	}()
 

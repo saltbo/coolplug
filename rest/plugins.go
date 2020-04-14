@@ -62,7 +62,7 @@ func (r *PluginResource) install(c *gin.Context) {
 		return
 	}
 
-	c.String(http.StatusOK, fmt.Sprintf("File %s uploaded successfully with fields name=%s and email=%s.", file.Filename, name))
+	c.String(http.StatusOK, fmt.Sprintf("File %s uploaded successfully with fields name=%s.", file.Filename, name))
 }
 
 func (r *PluginResource) uninstall(c *gin.Context) {
