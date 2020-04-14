@@ -23,8 +23,6 @@ builds:
   - id: client
     main: ./cmd/client/main.go
     binary: client
-    env:
-      - CGO_ENABLED=0
     goos:
       - linux
       - darwin
