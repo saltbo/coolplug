@@ -1,6 +1,8 @@
 package client
 
 import (
+	"fmt"
+	"net/http"
 	"net/url"
 
 	"github.com/go-resty/resty/v2"
@@ -34,7 +36,11 @@ func (hc *HTTPClient) PluginList() ([]model.Plugin, error) {
 }
 
 func (hc *HTTPClient) PluginInstall(pi url.Values, filepath string) (err error) {
-	_, err = hc.R().SetFormDataFromValues(pi).SetFile("file", filepath).Post("/api/plugins")
+	resp, err := hc.R().SetFormDataFromValues(pi).SetFile("file", filepath).Post("/api/plugins")
+	if resp.StatusCode() != http.StatusOK {
+		return fmt.Errorf(resp.String())
+	}
+
 	return
 }
 

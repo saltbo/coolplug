@@ -5,7 +5,7 @@ import (
 	"os"
 	"time"
 
-	_ "github.com/jinzhu/gorm/dialects/sqlite"
+	_ "github.com/jinzhu/gorm/dialects/mysql"
 	"github.com/urfave/cli"
 
 	"github.com/saltbo/coolplug/core"

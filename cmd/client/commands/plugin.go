@@ -52,7 +52,7 @@ func list(c *ACtx) {
 
 func install(c *ACtx) {
 	for _, file := range c.cliCtx.Args() {
-		var pi url.Values
+		pi := make(url.Values)
 		pi.Set("name", c.cliCtx.String("name"))
 		pi.Set("intro", c.cliCtx.String("intro"))
 		err := c.client.PluginInstall(pi, file)

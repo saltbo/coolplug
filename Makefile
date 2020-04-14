@@ -31,4 +31,4 @@ help: ## Display this help screen
 	@grep -h -E '^[a-zA-Z_-]+:.*?## .*$$' $(MAKEFILE_LIST) | awk 'BEGIN {FS = ":.*?## "}; {printf "\033[36m%-30s\033[0m %s\n", $$1, $$2}'
 
 example: ## Build the example plugin
-	@go build -v -buildmode=plugin -o=build/plugins/example.so plugin_example/main.go
+	CGO_ENABLED=1 GOOS=linux GOARCH=amd64 go build -v -buildmode=plugin -o=build/plugins/example.so plugin_example/main.go
